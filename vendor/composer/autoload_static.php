@@ -4,20 +4,14 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit57274eaa4aa087b1b60f792066c1f91a
+class ComposerStaticInit260b9c751e1593678c67833a190f64aa
 {
     public static $files = array (
-<<<<<<< HEAD
-        '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
-        '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
-        'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
-=======
         '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
         'ec07570ca5a812141189b1fa81503674' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
->>>>>>> 8a5c728 (CI/CD Config Commit)
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -29,10 +23,7 @@ class ComposerStaticInit57274eaa4aa087b1b60f792066c1f91a
         ),
         'P' => 
         array (
-<<<<<<< HEAD
-=======
             'PhpParser\\' => 10,
->>>>>>> 8a5c728 (CI/CD Config Commit)
             'PhpOption\\' => 10,
             'PHPMailer\\PHPMailer\\' => 20,
         ),
@@ -43,15 +34,12 @@ class ComposerStaticInit57274eaa4aa087b1b60f792066c1f91a
         'D' => 
         array (
             'Dotenv\\' => 7,
-<<<<<<< HEAD
-=======
             'Doctrine\\Instantiator\\' => 22,
             'DeepCopy\\' => 9,
         ),
         'A' => 
         array (
             'App\\' => 4,
->>>>>>> 8a5c728 (CI/CD Config Commit)
         ),
     );
 
@@ -68,13 +56,10 @@ class ComposerStaticInit57274eaa4aa087b1b60f792066c1f91a
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-ctype',
         ),
-<<<<<<< HEAD
-=======
         'PhpParser\\' => 
         array (
             0 => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser',
         ),
->>>>>>> 8a5c728 (CI/CD Config Commit)
         'PhpOption\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpoption/phpoption/src/PhpOption',
@@ -91,8 +76,6 @@ class ComposerStaticInit57274eaa4aa087b1b60f792066c1f91a
         array (
             0 => __DIR__ . '/..' . '/vlucas/phpdotenv/src',
         ),
-<<<<<<< HEAD
-=======
         'Doctrine\\Instantiator\\' => 
         array (
             0 => __DIR__ . '/..' . '/doctrine/instantiator/src/Doctrine/Instantiator',
@@ -105,16 +88,11 @@ class ComposerStaticInit57274eaa4aa087b1b60f792066c1f91a
         array (
             0 => __DIR__ . '/../..' . '/app',
         ),
->>>>>>> 8a5c728 (CI/CD Config Commit)
     );
 
     public static $classMap = array (
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
-<<<<<<< HEAD
-        'PhpToken' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/PhpToken.php',
-        'Stringable' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
-=======
         'PHPUnit\\Exception' => __DIR__ . '/..' . '/phpunit/phpunit/src/Exception.php',
         'PHPUnit\\Framework\\ActualValueIsNotAnObjectException' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Exception/ActualValueIsNotAnObjectException.php',
         'PHPUnit\\Framework\\Assert' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert.php',
@@ -746,7 +724,6 @@ class ComposerStaticInit57274eaa4aa087b1b60f792066c1f91a
         'TheSeer\\Tokenizer\\TokenCollectionException' => __DIR__ . '/..' . '/theseer/tokenizer/src/TokenCollectionException.php',
         'TheSeer\\Tokenizer\\Tokenizer' => __DIR__ . '/..' . '/theseer/tokenizer/src/Tokenizer.php',
         'TheSeer\\Tokenizer\\XMLSerializer' => __DIR__ . '/..' . '/theseer/tokenizer/src/XMLSerializer.php',
->>>>>>> 8a5c728 (CI/CD Config Commit)
         'UnhandledMatchError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
         'ValueError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
     );
@@ -754,9 +731,9 @@ class ComposerStaticInit57274eaa4aa087b1b60f792066c1f91a
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit57274eaa4aa087b1b60f792066c1f91a::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit57274eaa4aa087b1b60f792066c1f91a::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit57274eaa4aa087b1b60f792066c1f91a::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit260b9c751e1593678c67833a190f64aa::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit260b9c751e1593678c67833a190f64aa::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit260b9c751e1593678c67833a190f64aa::$classMap;
 
         }, null, ClassLoader::class);
     }

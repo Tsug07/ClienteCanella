@@ -1,15 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => '__root__',
-<<<<<<< HEAD
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '22f9fa89e1aeb69be2babd157651fad1d5c0b625',
-=======
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
-        'reference' => null,
->>>>>>> 8a5c728 (CI/CD Config Commit)
+        'reference' => 'b706d8391e12895fffe3fd4d07be7c5ee1d3789b',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -17,22 +11,14 @@
     ),
     'versions' => array(
         '__root__' => array(
-<<<<<<< HEAD
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '22f9fa89e1aeb69be2babd157651fad1d5c0b625',
-=======
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
-            'reference' => null,
->>>>>>> 8a5c728 (CI/CD Config Commit)
+            'reference' => 'b706d8391e12895fffe3fd4d07be7c5ee1d3789b',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
-<<<<<<< HEAD
-=======
         'doctrine/instantiator' => array(
             'pretty_version' => '2.0.0',
             'version' => '2.0.0.0',
@@ -42,7 +28,6 @@
             'aliases' => array(),
             'dev_requirement' => true,
         ),
->>>>>>> 8a5c728 (CI/CD Config Commit)
         'graham-campbell/result-type' => array(
             'pretty_version' => 'v1.1.3',
             'version' => '1.1.3.0',
@@ -52,8 +37,6 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
-<<<<<<< HEAD
-=======
         'myclabs/deep-copy' => array(
             'pretty_version' => '1.13.0',
             'version' => '1.13.0.0',
@@ -90,7 +73,6 @@
             'aliases' => array(),
             'dev_requirement' => true,
         ),
->>>>>>> 8a5c728 (CI/CD Config Commit)
         'phpmailer/phpmailer' => array(
             'pretty_version' => 'v6.9.3',
             'version' => '6.9.3.0',
@@ -109,8 +91,6 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
-<<<<<<< HEAD
-=======
         'phpunit/php-code-coverage' => array(
             'pretty_version' => '9.2.32',
             'version' => '9.2.32.0',
@@ -309,7 +289,6 @@
             'aliases' => array(),
             'dev_requirement' => true,
         ),
->>>>>>> 8a5c728 (CI/CD Config Commit)
         'symfony/polyfill-ctype' => array(
             'pretty_version' => 'v1.31.0',
             'version' => '1.31.0.0',
@@ -337,8 +316,6 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
-<<<<<<< HEAD
-=======
         'theseer/tokenizer' => array(
             'pretty_version' => '1.2.3',
             'version' => '1.2.3.0',
@@ -348,7 +325,6 @@
             'aliases' => array(),
             'dev_requirement' => true,
         ),
->>>>>>> 8a5c728 (CI/CD Config Commit)
         'vlucas/phpdotenv' => array(
             'pretty_version' => 'v5.6.1',
             'version' => '5.6.1.0',

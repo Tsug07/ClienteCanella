@@ -25,13 +25,8 @@ $id = intval($_GET['id']);
 require_once '../../includes/database.php';
 
 // Verificar se o funcionário pertence à empresa do usuário logado
-<<<<<<< HEAD
 $stmt = $conn->prepare("SELECT e.id FROM empregados e 
                         JOIN empresas emp ON e.codigo_empresa = emp.codigo 
-=======
-$stmt = $conn->prepare("SELECT e.id FROM empregados e
-                        JOIN empresas emp ON e.codigo_empresa = emp.codigo
->>>>>>> 8a5c728 (CI/CD Config Commit)
                         WHERE e.id = ? AND emp.cnpj = ?");
 $stmt->bind_param("is", $id, $_SESSION['cnpj']);
 $stmt->execute();
