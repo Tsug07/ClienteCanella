@@ -4,11 +4,11 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-<<<<<<< HEAD
+
     "content-hash": "43f04f8ab298ae680223494104e06cf9",
-=======
+
     "content-hash": "260b9c751e1593678c67833a190f64aa",
->>>>>>> 8a5c728 (CI/CD Config Commit)
+
     "packages": [
         {
             "name": "graham-campbell/result-type",
@@ -552,9 +552,9 @@
             "time": "2024-07-20T21:52:34+00:00"
         }
     ],
-<<<<<<< HEAD
+
     "packages-dev": [],
-=======
+
     "packages-dev": [
         {
             "name": "doctrine/instantiator",
