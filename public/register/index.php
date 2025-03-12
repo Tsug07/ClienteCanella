@@ -5,11 +5,9 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
    session_start();
-<<<<<<< HEAD
+
 include '../../includes/head.php'; 
-=======
-include '../../includes/head.php';
->>>>>>> 8a5c728 (CI/CD Config Commit)
+
 ?>
    <div class="main-container">
    
