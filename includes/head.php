@@ -5,5 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Canella</title>
     <link rel="stylesheet" href="../assets/css/styles.css">
-    <script src="../assets/js/scripts.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script defer src="../assets/js/scripts.js"></script>
 </head>

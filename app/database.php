@@ -11,11 +11,12 @@ $password = $_ENV['DB_PASS'];
 $dbname = $_ENV['DB_NAME'];
 $port = $_ENV['DB_PORT'];
 
-$conn = new mysqli($servername, $username, $password, $dbname, $port);
-
+try {
+    $conn = new mysqli($servername, $username, $password, $dbname, $port);
 if ($conn->connect_error) {
     die("Falha na conexão com MariaDB: " . $conn->connect_error);
 }
-
-echo "<script>console.log('Conectado com sucesso à VM!');</script>";
+} catch (Exception $e) {
+    die("Erro na conexão: " . $e->getMessage());
+}
 ?>

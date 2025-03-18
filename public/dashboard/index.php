@@ -7,6 +7,8 @@ if (!isset($_SESSION['user_id'])) {
 
 // Incluir arquivo de conexão com o banco de dados
 require_once '../../app/database.php';
+// Incluir o cabeçalho padrão
+include '../../includes/header.php';
 
 // Consulta informações da empresa
 $cnpj = $_SESSION['cnpj']; 
@@ -25,22 +27,74 @@ if (!$empresa) {
     ];
 }
 
-// Consulta contagem de empregados
-$stmt = $conn->prepare("SELECT COUNT(*) as total FROM empregados WHERE codigo_empresa = ?");
-$stmt->bind_param("i", $empresa['codigo_empresa']);
-$stmt->execute();
-$result = $stmt->get_result();
-$totalEmpregados = $result->fetch_assoc()['total'];
+// Verificar se há um termo de busca
+$searchTerm = isset($_GET['search']) ? $_GET['search'] : '';
 
-// Consulta lista de empregados
-$stmt = $conn->prepare("SELECT codigo_empresa, nome, cpf, i_empregados FROM empregados WHERE codigo_empresa = ? ORDER BY nome");
-$stmt->bind_param("i", $empresa['codigo_empresa']);
+// Construir a consulta base
+$totalFixosQuery = "SELECT COUNT(*) as total FROM empregados WHERE codigo_empresa = ?";
+$countQuery = "SELECT COUNT(*) as total FROM empregados WHERE codigo_empresa = ?";
+$employeesQuery = "SELECT i_empregados, nome, cpf FROM empregados WHERE codigo_empresa = ?";
+
+// Parâmetros para a consulta
+$params = [$empresa['codigo_empresa']];
+$types = "i";
+
+// Consultar o total fixo de empregados (sem filtro de busca)
+$stmtTotalFixos = $conn->prepare($totalFixosQuery);
+$stmtTotalFixos->bind_param($types, ...$params);
+$stmtTotalFixos->execute();
+$resultTotalFixos = $stmtTotalFixos->get_result();
+$totalEmpregadosFixos = $resultTotalFixos->fetch_assoc()['total'];
+
+// Adicionar filtro de busca se necessário
+if (!empty($searchTerm)) {
+    $searchWildcard = "%{$searchTerm}%";
+    $countQuery .= " AND (nome LIKE ? OR cpf LIKE ?)";
+    $employeesQuery .= " AND (nome LIKE ? OR cpf LIKE ?)";
+    $params[] = $searchWildcard;
+    $params[] = $searchWildcard;
+    $types .= "ss";
+}
+
+// Consultar o total de empregados (para paginação)
+$stmt = $conn->prepare($countQuery);
+$stmt->bind_param($types, ...$params);
 $stmt->execute();
 $result = $stmt->get_result();
+$totalEmployees = $result->fetch_assoc()['total'];
+
+// Configurações de paginação
+$itemsPerPage = 10; // Número de funcionários por página
+$currentPage = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+$totalPages = ceil($totalEmployees / $itemsPerPage);
+
+// Ajustar página atual se exceder o total de páginas
+if ($currentPage > $totalPages && $totalPages > 0) {
+    $currentPage = $totalPages;
+}
+
+// Calcular offset para a consulta SQL
+$offset = ($currentPage - 1) * $itemsPerPage;
+
+// Consultar os empregados para a página atual
+$employeesQuery .= " ORDER BY nome LIMIT ? OFFSET ?";
+$params[] = $itemsPerPage;
+$params[] = $offset;
+$types .= "ii";
+
+$stmt = $conn->prepare($employeesQuery);
+$stmt->bind_param($types, ...$params);
+$stmt->execute();
+$result = $stmt->get_result();
+
 $empregados = [];
 while ($row = $result->fetch_assoc()) {
     $empregados[] = $row;
 }
+
+// Calcular índices para a mensagem de exibição
+$startIndex = ($currentPage - 1) * $itemsPerPage;
+$endIndex = min($startIndex + $itemsPerPage - 1, $totalEmployees - 1);
 
 // Formatação do CNPJ para exibição
 function formatarCNPJ($cnpj) {
@@ -49,8 +103,6 @@ function formatarCNPJ($cnpj) {
     return preg_replace("/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/", "$1.$2.$3/$4-$5", $cnpj);
 }
 
-// Incluir o cabeçalho padrão
-include '../../includes/header.php';
 ?>
 
 <div class="dashboard-wrapper">
@@ -61,16 +113,7 @@ include '../../includes/header.php';
             <h2><?php echo htmlspecialchars($empresa['razao_social']); ?></h2>
             <p>CNPJ: <?php echo formatarCNPJ($empresa['cnpj']); ?></p>
         </div>
-        <div class="company-actions">
-            <a href="profile.php" class="btn btn-outline">
-                <i class="fas fa-user"></i>
-                Perfil
-            </a>
-            <a href="../sign-out/" class="btn btn-primary">
-                <i class="fas fa-sign-out-alt"></i>
-                Sair
-            </a>
-        </div>
+        
     </div>
 
     <!-- Cards de Estatísticas -->
@@ -82,15 +125,15 @@ include '../../includes/header.php';
                 </div>
                 <div class="stat-card-content">
                     <h3>Total de Funcionários</h3>
-                    <p><?php echo $totalEmpregados; ?></p>
+                    <p><?php echo $totalEmpregadosFixos; ?></p>
                 </div>
             </div>
-            <div class="stat-card-footer">
+            <!-- <div class="stat-card-footer">
                 <a href="novo_funcionario.php">
                     Adicionar funcionário
                     <i class="fas fa-arrow-right"></i>
                 </a>
-            </div>
+            </div> -->
         </div>
 
         <div class="stat-card">
@@ -132,198 +175,267 @@ include '../../includes/header.php';
 
     <!-- Lista de Funcionários -->
     <div class="main-content">
-        <div class="content-header">
-            <h2>Funcionários</h2>
-            <div class="content-actions">
-                <div class="search-bar">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="searchEmployee" placeholder="Buscar funcionário...">
-                </div>
-                <a href="novo_funcionario.php" class="btn btn-primary">
-                    <i class="fas fa-plus"></i>
-                    Novo
+    <div class="content-header">
+        <h2>Funcionários</h2>
+        <div class="content-actions">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchEmployee" placeholder="Buscar funcionário...">
+            </div>
+            <!-- <a href="novo_funcionario.php" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                Novo
+            </a> -->
+        </div>
+    </div>
+
+    <?php if ($totalEmployees > 0): ?>
+        <div class="responsive-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>Visualizar</th>
+                    </tr>
+                </thead>
+                <tbody id="employeeTableBody">
+                    <?php foreach ($empregados as $empregado): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($empregado['nome']); ?></td>
+                            <td><?php echo htmlspecialchars($empregado['cpf']); ?></td>
+                            <td>
+                                <div class="action-buttons">
+                                <button class="action-btn view-btn" title="Visualizar" 
+        onclick="showEmployeePopup(<?php echo $empregado['i_empregados']; ?>, '<?php echo htmlspecialchars($empregado['nome']); ?>')">
+    <i class="fas fa-eye"></i>
+</button>
+                                    <!-- <a href="editar_empregado.php?id=<?php echo $empregado['i_empregados']; ?>" class="action-btn edit-btn" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button class="action-btn delete-btn" title="Excluir" 
+                                            onclick="showDeleteModal(<?php echo $empregado['i_empregados']; ?>, '<?php echo htmlspecialchars($empregado['nome']); ?>')">
+                                        <i class="fas fa-trash"></i>
+                                    </button> -->
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginação -->
+        <div class="pagination-container">
+            <div class="pagination-info">
+                Mostrando <?php echo $startIndex + 1; ?> a <?php echo min($endIndex + 1, $totalEmployees); ?> de <?php echo $totalEmployees; ?> funcionários
+            </div>
+            <div class="pagination">
+                <!-- Botão para primeira página -->
+                <a href="?page=1<?php echo !empty($searchTerm) ? '&search='.urlencode($searchTerm) : ''; ?>" class="pagination-btn <?php echo $currentPage == 1 ? 'disabled' : ''; ?>" title="Primeira página">
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+                
+                <!-- Botão para página anterior -->
+                <a href="?page=<?php echo max(1, $currentPage - 1); ?><?php echo !empty($searchTerm) ? '&search='.urlencode($searchTerm) : ''; ?>" class="pagination-btn <?php echo $currentPage == 1 ? 'disabled' : ''; ?>" title="Página anterior">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+                
+                <!-- Números das páginas -->
+                <?php
+                $startPage = max(1, min($currentPage - 2, $totalPages - 4));
+                $endPage = min($startPage + 4, $totalPages);
+                
+                for ($i = $startPage; $i <= $endPage; $i++):
+                ?>
+                    <a href="?page=<?php echo $i; ?><?php echo !empty($searchTerm) ? '&search='.urlencode($searchTerm) : ''; ?>" class="pagination-btn <?php echo $currentPage == $i ? 'active' : ''; ?>">
+                        <?php echo $i; ?>
+                    </a>
+                <?php endfor; ?>
+                
+                <!-- Botão para próxima página -->
+                <a href="?page=<?php echo min($totalPages, $currentPage + 1); ?><?php echo !empty($searchTerm) ? '&search='.urlencode($searchTerm) : ''; ?>" class="pagination-btn <?php echo $currentPage == $totalPages ? 'disabled' : ''; ?>" title="Próxima página">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+                
+                <!-- Botão para última página -->
+                <a href="?page=<?php echo $totalPages; ?><?php echo !empty($searchTerm) ? '&search='.urlencode($searchTerm) : ''; ?>" class="pagination-btn <?php echo $currentPage == $totalPages ? 'disabled' : ''; ?>" title="Última página">
+                    <i class="fas fa-angle-double-right"></i>
                 </a>
             </div>
         </div>
-
-        <?php if (count($empregados) > 0): ?>
-            <div class="responsive-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nome</th>
-                            <th>CPF</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($empregados as $empregado): ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($empregado['nome']); ?></td>
-                                <td><?php echo htmlspecialchars($empregado['cpf']); ?></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <a href="visualizar_empregado.php?id=<?php echo $empregado['i_empregados']; ?>" class="action-btn view-btn" title="Visualizar">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a href="editar_empregado.php?id=<?php echo $empregado['i_empregados']; ?>" class="action-btn edit-btn" title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <button class="action-btn delete-btn" title="Excluir" 
-                                                onclick="showDeleteModal(<?php echo $empregado['i_empregados']; ?>, '<?php echo htmlspecialchars($empregado['nome']); ?>')">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+    <?php else: ?>
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-users"></i>
             </div>
-        <?php else: ?>
-            <div class="empty-state">
-                <div class="empty-state-icon">
-                    <i class="fas fa-users"></i>
-                </div>
-                <h3>Nenhum funcionário cadastrado</h3>
-                <p>Comece adicionando um novo funcionário ao seu cadastro</p>
-                <a href="novo_funcionario.php" class="btn btn-primary">
-                    <i class="fas fa-plus"></i>
-                    Adicionar Funcionário
-                </a>
-            </div>
-        <?php endif; ?>
-    </div>
+            <h3>Nenhum funcionário cadastrado</h3>  
+        </div>
+    <?php endif; ?>
+</div>
 </div>
 
-<!-- Modal de Confirmação de Exclusão -->
-<div id="deleteModal" class="modal">
-    <div class="modal-content">
+<!-- Modal de Visualização de Funcionário -->
+<div id="employeePopup" class="modal">
+    <div class="modal-content employee-modal">
         <div class="modal-header">
-            <h3>Confirmar Exclusão</h3>
+            <h3 id="popupEmployeeName">Informações do Funcionário</h3>
+            <button class="close-btn" onclick="closeEmployeePopup()">✕</button>
         </div>
         <div class="modal-body">
-            <p>Tem certeza que deseja excluir o funcionário <strong id="employeeName"></strong>? Esta ação não pode ser desfeita.</p>
+            <div id="employeeDetails" class="loading">
+                <div class="loader-container">
+                    <div class="loader"></div>
+                    <p>Carregando informações...</p>
+                </div>
+            </div>
+            
+            <div id="employeeData" class="employee-data-container" style="display: none;">
+                <!-- Cabeçalho -->
+                <div class="employee-section employee-header-section">
+                    <div class="employee-avatar">
+                        <div class="avatar-placeholder">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    </div>
+                    <div class="employee-header-info">
+                        <h4 id="employeeHeaderName">-</h4>
+                        <div class="employee-id-badges">
+                            <span class="badge badge-cpf" id="employeeHeaderCpf">-</span>
+                            <span class="badge badge-code" id="employeeEsocialCode">-</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Abas de informações -->
+                <div class="employee-tabs">
+                    <button class="tab-btn active" data-tab="personal">Dados Pessoais</button>
+                    <button class="tab-btn" data-tab="contract">Contrato</button>
+                    <button class="tab-btn" data-tab="contact">Contato</button>
+                    <button class="tab-btn" data-tab="benefits">Benefícios</button>
+                </div>
+                
+                <!-- Conteúdo das abas -->
+                <div class="tabs-content">
+                    <!-- Tab: Dados Pessoais -->
+                    <div class="tab-content active" id="tab-personal">
+                        <div class="employee-details-grid">
+                            <div class="detail-item">
+                                <span class="detail-label">Nome Completo</span>
+                                <span class="detail-value" id="employeeName">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">CPF</span>
+                                <span class="detail-value" id="employeeCpf">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Data de Nascimento</span>
+                                <span class="detail-value" id="employeeBirthdate">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Sexo</span>
+                                <span class="detail-value" id="employeeGender">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Estado Civil</span>
+                                <span class="detail-value" id="employeeMaritalStatus">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Nacionalidade</span>
+                                <span class="detail-value" id="employeeNationality">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tab: Contrato -->
+                    <div class="tab-content" id="tab-contract">
+                        <div class="employee-details-grid">
+                            <div class="detail-item">
+                                <span class="detail-label">Data de Admissão</span>
+                                <span class="detail-value" id="employeeAdmission">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Cargo</span>
+                                <span class="detail-value" id="employeePosition">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Salário</span>
+                                <span class="detail-value" id="employeeSalary">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Horas/Mês</span>
+                                <span class="detail-value" id="employeeHours">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Vencimento de Férias</span>
+                                <span class="detail-value" id="employeeVacation">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Tipo de Contrato</span>
+                                <span class="detail-value" id="employeeContractType">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tab: Contato -->
+                    <div class="tab-content" id="tab-contact">
+                        <div class="employee-details-grid">
+                            <div class="detail-item">
+                                <span class="detail-label">Telefone</span>
+                                <span class="detail-value" id="employeePhone">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Email</span>
+                                <span class="detail-value" id="employeeEmail">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Endereço</span>
+                                <span class="detail-value" id="employeeAddress">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Cidade/Estado</span>
+                                <span class="detail-value" id="employeeCityState">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">CEP</span>
+                                <span class="detail-value" id="employeeZipCode">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tab: Benefícios -->
+                    <div class="tab-content" id="tab-benefits">
+                        <div class="employee-details-grid">
+                            <div class="detail-item">
+                                <span class="detail-label">Plano de Saúde</span>
+                                <span class="detail-value" id="employeeHealthPlan">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Contribuição Sindical</span>
+                                <span class="detail-value" id="employeeUnion">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Taxas Autorizadas</span>
+                                <span class="detail-value" id="employeeFees">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Vale Transporte</span>
+                                <span class="detail-value" id="employeeTransport">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Vale Refeição</span>
+                                <span class="detail-value" id="employeeFood">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="modal-footer">
-            <button id="cancelDelete" class="btn btn-outline">Cancelar</button>
-            <button id="confirmDelete" class="btn btn-primary" style="background-color: var(--danger-color);">Excluir</button>
+            <button class="btn btn-primary" onclick="closeEmployeePopup()">Fechar</button>
         </div>
     </div>
 </div>
 
-<!-- Scripts -->
-<script>
-    // Elemento do modal
-    const deleteModal = document.getElementById('deleteModal');
-    const employeeName = document.getElementById('employeeName');
-    const cancelDelete = document.getElementById('cancelDelete');
-    const confirmDelete = document.getElementById('confirmDelete');
-    
-    // ID do funcionário a ser excluído
-    let employeeIdToDelete = null;
-    
-    // Função para mostrar o modal de exclusão
-    function showDeleteModal(id, name) {
-        employeeIdToDelete = id;
-        employeeName.textContent = name;
-        deleteModal.style.display = 'flex';
-    }
-    
-    // Fechar o modal ao clicar em Cancelar
-    cancelDelete.addEventListener('click', function() {
-        deleteModal.style.display = 'none';
-        employeeIdToDelete = null;
-    });
-    
-    // Fechar o modal ao clicar fora dele
-    window.addEventListener('click', function(event) {
-        if (event.target === deleteModal) {
-            deleteModal.style.display = 'none';
-            employeeIdToDelete = null;
-        }
-    });
-    
-    // Confirmar exclusão
-    confirmDelete.addEventListener('click', function() {
-        if (employeeIdToDelete) {
-            // Enviar solicitação AJAX para excluir o funcionário
-            fetch(`excluir_empregado.php?id=${employeeIdToDelete}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Remover linha da tabela
-                    const row = document.querySelector(`button[onclick*="${employeeIdToDelete}"]`).closest('tr');
-                    row.remove();
-                    
-                    // Atualizar contador de funcionários
-                    const countElement = document.querySelector('.stat-card-content p');
-                    const currentCount = parseInt(countElement.textContent);
-                    countElement.textContent = currentCount - 1;
-                    
-                    // Verificar se a tabela está vazia
-                    const tbody = document.querySelector('tbody');
-                    if (tbody && tbody.children.length === 0) {
-                        document.querySelector('.responsive-table').innerHTML = `
-                            <div class="empty-state">
-                                <div class="empty-state-icon">
-                                    <i class="fas fa-users"></i>
-                                </div>
-                                <h3>Nenhum funcionário cadastrado</h3>
-                                <p>Comece adicionando um novo funcionário ao seu cadastro</p>
-                                <a href="novo_funcionario.php" class="btn btn-primary">
-                                    <i class="fas fa-plus"></i>
-                                    Adicionar Funcionário
-                                </a>
-                            </div>
-                        `;
-                    }
-                } else {
-                    alert('Erro ao excluir funcionário: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Erro:', error);
-                alert('Ocorreu um erro ao processar sua solicitação.');
-            })
-            .finally(() => {
-                deleteModal.style.display = 'none';
-                employeeIdToDelete = null;
-            });
-        }
-    });
-    
-    // Filtrar funcionários
-    document.getElementById('searchEmployee').addEventListener('keyup', function() {
-        const searchTerm = this.value.toLowerCase();
-        const rows = document.querySelectorAll('tbody tr');
-        
-        rows.forEach(row => {
-            const name = row.querySelector('td:first-child').textContent.toLowerCase();
-            const cpf = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-            
-            if (name.includes(searchTerm) || cpf.includes(searchTerm)) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
-    });
-    
-    // Botão de exportação
-    document.getElementById('exportButton').addEventListener('click', function(e) {
-        e.preventDefault();
-        alert('Funcionalidade de exportação será implementada em breve.');
-    });
-</script>
 
-<!-- Incluir Font Awesome para ícones -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
-<!-- <?php include '../../includes/footer.php'; ?> -->
+<?php include '../../includes/footer.php'; ?> 
