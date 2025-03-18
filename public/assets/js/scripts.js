@@ -30,6 +30,9 @@ function formatarSalario(salario) {
 function formatarTelefone(telefone) {
     if (!telefone) return 'Não informado';
     
+    // Garante que telefone seja uma string
+    telefone = String(telefone);
+
     // Remove caracteres não numéricos
     const numero = telefone.replace(/\D/g, '');
     
