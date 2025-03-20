@@ -312,6 +312,49 @@ h1 {
     color: #007bff;
 }
 
+/* Estilos para a seção inferior */
+.footer-bottom {
+    max-width: 1200px;
+    margin: 20px auto 0;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(233, 236, 239, 0.2); /* Linha sutil para separar */
+}
+
+.footer-bottom .copyright {
+    margin: 0;
+    font-size: 12px;
+}
+
+.developed-by {
+    display: flex;
+    align-items: center;
+}
+
+.developed-by p {
+    margin: 0 10px 0 0;
+    font-size: 12px;
+    color: #e9ecef;
+}
+
+.social-icons {
+    display: flex;
+}
+
+.social-icons a {
+    color: #e9ecef;
+    font-size: 18px; /* Tamanho dos ícones ajustado */
+    margin-left: 10px;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.social-icons a:hover {
+    color: #007bff;
+}
+
 /* Responsividade */
 @media (max-width: 768px) {
     .footer-content {
@@ -321,6 +364,27 @@ h1 {
 
     .footer-section {
         margin: 20px 0;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .footer-bottom .copyright {
+        margin-bottom: 10px;
+    }
+
+    .developed-by {
+        justify-content: center;
+    }
+
+    .developed-by p {
+        margin: 0 0 10px 0; /* Ajuste para mobile */
+    }
+
+    .social-icons a {
+        margin: 0 5px; /* Espaçamento menor em mobile */
     }
 }
 

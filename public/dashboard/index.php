@@ -5,6 +5,16 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+// Definindo o título dinâmico para a página
+$page_title = "Dashboard | Canella & Santos"; // Título padrão para a página de login
+
+// Caso haja uma mensagem de erro, você pode alterar o título para algo como "Erro ao fazer login"
+if (isset($_SESSION['error'])) {
+    $page_title = "Erro no Dashboard || Canella & Santos";
+}
+
+include '../../includes/head.php';
+
 // Incluir arquivo de conexão com o banco de dados
 require_once '../../app/database.php';
 // Incluir o cabeçalho padrão

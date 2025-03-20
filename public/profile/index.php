@@ -7,6 +7,15 @@ if (!isset($_SESSION['user_id'])) {
 
 // Incluir arquivo de conexão com o banco de dados
 require_once '../../app/database.php';
+require_once '../utils.php';
+
+$page_title = "Perfil | Canella & Santos"; // Título padrão para a página de login
+
+// Caso haja uma mensagem de erro, você pode alterar o título para algo como "Erro ao fazer login"
+if (isset($_SESSION['error'])) {
+    $page_title = "Erro no Perfil || Canella & Santos";
+}
+include '../../includes/head.php';
 
 // Consulta informações da empresa
 $cnpj = $_SESSION['cnpj'];
@@ -51,19 +60,6 @@ if (!$usuario) {
     ];
 }
 
-// Formatação do CNPJ para exibição
-function formatarCNPJ($cnpj) {
-    $cnpj = preg_replace('/[^0-9]/', '', $cnpj); // Remove caracteres não numéricos
-    if (strlen($cnpj) != 14) return $cnpj; // Retorna sem formatação se não tiver 14 dígitos
-    return preg_replace("/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/", "$1.$2.$3/$4-$5", $cnpj);
-}
-
-// Formatação de data
-function formatarData($data) {
-    if (!$data) return 'Não disponível';
-    $timestamp = strtotime($data);
-    return date('d/m/Y H:i', $timestamp);
-}
 
 // Verificar se há mensagens de sucesso ou erro
 $mensagemSucesso = isset($_SESSION['success']) ? $_SESSION['success'] : '';
@@ -122,10 +118,10 @@ include '../../includes/header.php';
                     <i class="fas fa-user"></i>
                     <span>Minha Conta</span>
                 </li>
-                <li class="nav-item" data-tab="security">
+                <!-- <li class="nav-item" data-tab="security">
                     <i class="fas fa-shield-alt"></i>
                     <span>Segurança</span>
-                </li>
+                </li> -->
                 <!-- <li class="nav-item" data-tab="notifications">
                     <i class="fas fa-bell"></i>
                     <span>Notificações</span>
@@ -342,7 +338,7 @@ include '../../includes/header.php';
             </div>
 
             <!-- Tab: Segurança -->
-            <div class="profile-tab" id="security">
+            <!-- <div class="profile-tab" id="security">
                 <div class="section-header">
                     <h2>Segurança</h2>
                 </div>
@@ -363,7 +359,7 @@ include '../../includes/header.php';
                         </form>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
             <!-- Tab: Notificações -->
             <!-- <div class="profile-tab" id="notifications">
@@ -431,73 +427,50 @@ include '../../includes/header.php';
             <!-- Tab: Atividade Recente -->
             <div class="profile-tab" id="activity">
                 <div class="section-header">
-                    <h2>Atividade Recente</h2>
+                    <h2>Atividades Recentes</h2>
                 </div>
 
                 <div class="card">
                     <div class="card-body">
                         <div class="activity-log">
-                            <div class="activity-item">
-                                <div class="activity-icon">
-                                    <i class="fas fa-sign-in-alt"></i>
-                                </div>
-                                <div class="activity-details">
-                                    <div class="activity-title">Login no sistema</div>
-                                    <div class="activity-time">Hoje, 08:30</div>
-                                    <div class="activity-description">IP: 192.168.1.1 | Navegador: Chrome</div>
-                                </div>
-                            </div>
+                        <?php
+    // Incluir o arquivo com as funções de atividade
+    require_once 'activity_logger.php';
+    
+    // Obter atividades recentes do usuário
+    $atividades = obter_atividades_recentes($_SESSION['user_id'], $conn, 5);
+    
+    if (empty($atividades)): 
+    ?>
+        <div class="activity-empty">
+            <i class="fas fa-info-circle"></i>
+            <p>Nenhuma atividade registrada ainda.</p>
+        </div>
+    <?php else: ?>
+        <?php foreach ($atividades as $atividade): ?>
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="<?php echo obter_icone_atividade($atividade['tipo_atividade']); ?>"></i>
+                </div>
+                <div class="activity-details">
+                    <div class="activity-title"><?php echo formatar_titulo_atividade($atividade['tipo_atividade']); ?></div>
+                    <div class="activity-time"><?php echo formatarData($atividade['data_hora']); ?></div>
+                    <div class="activity-description">
+                        <?php echo htmlspecialchars($atividade['descricao']); ?> | 
+                        IP: <?php echo htmlspecialchars($atividade['ip']); ?> | 
+                        Navegador: <?php echo formatar_navegador($atividade['user_agent']); ?>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+</div>
 
-                            <div class="activity-item">
-                                <div class="activity-icon">
-                                    <i class="fas fa-user-edit"></i>
-                                </div>
-                                <div class="activity-details">
-                                    <div class="activity-title">Perfil atualizado</div>
-                                    <div class="activity-time">Ontem, 14:15</div>
-                                    <div class="activity-description">Email de contato alterado</div>
-                                </div>
-                            </div>
-
-                            <div class="activity-item">
-                                <div class="activity-icon">
-                                    <i class="fas fa-key"></i>
-                                </div>
-                                <div class="activity-details">
-                                    <div class="activity-title">Token renovado</div>
-                                    <div class="activity-time">15/03/2025, 10:22</div>
-                                    <div class="activity-description">Novo token enviado para email cadastrado</div>
-                                </div>
-                            </div>
-
-                            <div class="activity-item">
-                                <div class="activity-icon">
-                                    <i class="fas fa-file-export"></i>
-                                </div>
-                                <div class="activity-details">
-                                    <div class="activity-title">Relatório exportado</div>
-                                    <div class="activity-time">10/03/2025, 16:45</div>
-                                    <div class="activity-description">Relatório de funcionários gerado em PDF</div>
-                                </div>
-                            </div>
-
-                            <div class="activity-item">
-                                <div class="activity-icon">
-                                    <i class="fas fa-user-plus"></i>
-                                </div>
-                                <div class="activity-details">
-                                    <div class="activity-title">Funcionário adicionado</div>
-                                    <div class="activity-time">05/03/2025, 09:10</div>
-                                    <div class="activity-description">Novo funcionário cadastrado: Ana Silva</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="text-center mt-4">
-                            <button class="btn btn-outline">
-                                <i class="fas fa-history"></i>
-                                Ver histórico completo
-                            </button>
+<div class="text-center mt-4">
+    <a href="historico_atividades.php" class="btn btn-outline">
+        <i class="fas fa-history"></i>
+        Ver histórico completo
+    </a>
                         </div>
                     </div>
                 </div>

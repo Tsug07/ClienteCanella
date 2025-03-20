@@ -1,15 +1,23 @@
-<?php 
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
+<?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-      session_start();
-    include '../../includes/head.php'; 
-    ?>  
+session_start();
+// Definindo o título dinâmico para a página
+$page_title = "Token | Canella & Santos"; // Título padrão para a página de login
 
-    <div class="main-container">
+// Caso haja uma mensagem de erro, você pode alterar o título para algo como "Erro ao fazer login"
+if (isset($_SESSION['error'])) {
+    $page_title = "Erro no Inserir Token || Canella & Santos";
+}
+
+include '../../includes/head.php';
+?>
+
+<div class="main-container">
     <div class="login-container">
-    <?php
+        <?php
         if (isset($_SESSION['error'])) {
             echo '<div class="alert alert-error">' . $_SESSION['error'] . '</div>';
             unset($_SESSION['error']);
@@ -19,9 +27,9 @@
             unset($_SESSION['success']);
         }
         ?>
-    <img src="../assets/images/logo_canella.png" alt="Logo Canella & Santos" class="logo">
+        <img src="../assets/images/logo_canella.png" alt="Logo Canella & Santos" class="logo">
         <h2>Inserir Token</h2>
-        
+
         <form action="/ClienteCanella/app/auth.php?action=login" method="post">
             <label for="token">Token:</label>
             <input type="text" id="token" name="token" required>
@@ -31,5 +39,5 @@
         <p class="resend-token-link">
             Não recebeu o token? <a href="/ClienteCanella/app/auth.php?action=request_token&resend=true">Clique aqui para reenviar</a>.
         </p>
-        </div>
     </div>
+</div>

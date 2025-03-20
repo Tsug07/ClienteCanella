@@ -5,7 +5,16 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
    session_start();
-include '../../includes/head.php'; 
+
+// Definindo o título dinâmico para a página
+$page_title = "Registrar | Canella & Santos"; // Título padrão para a página de login
+
+// Caso haja uma mensagem de erro, você pode alterar o título para algo como "Erro ao fazer login"
+if (isset($_SESSION['error'])) {
+    $page_title = "Erro no Registrar || Canella & Santos";
+}
+
+include '../../includes/head.php';
 ?>
    <div class="main-container">
    

@@ -36,7 +36,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" || ($_SERVER["REQUEST_METHOD"] == "GET"
         $_SESSION['logged_in'] = true;
         $_SESSION['user_id'] = $row['id']; // Armazena o ID do usuário na sessão
         $_SESSION['cnpj'] = $row['cnpj']; // Armazena o CNPJ na sessão
+        // Adicionando registro de atividade de login
+        require_once '../public/profile/activity_logger.php';
 
+        function registrar_login($user_id, $conn) {
+            registrar_atividade($user_id, 'login', 'Login no sistema', $conn);
+            
+            // Atualizar o último acesso
+            $stmt = $conn->prepare("UPDATE users SET ultimo_acesso = NOW() WHERE id = ?");
+            $stmt->bind_param("i", $user_id);
+            $stmt->execute();
+        }
         // Redireciona para o dashboard
         header("Location: /ClienteCanella/public/dashboard/");
         exit();
