@@ -21,7 +21,7 @@ require_once '../../app/database.php';
 include '../../includes/header.php';
 
 // Consulta informações da empresa
-$cnpj = $_SESSION['cnpj']; 
+$cnpj = $_SESSION['cnpj'];
 $stmt = $conn->prepare("SELECT codigo_empresa, razao_social, cnpj FROM empresas WHERE cnpj = ?");
 $stmt->bind_param("s", $cnpj);
 $stmt->execute();
@@ -107,7 +107,8 @@ $startIndex = ($currentPage - 1) * $itemsPerPage;
 $endIndex = min($startIndex + $itemsPerPage - 1, $totalEmployees - 1);
 
 // Formatação do CNPJ para exibição
-function formatarCNPJ($cnpj) {
+function formatarCNPJ($cnpj)
+{
     $cnpj = preg_replace('/[^0-9]/', '', $cnpj); // Remove caracteres não numéricos
     if (strlen($cnpj) != 14) return $cnpj; // Retorna sem formatação se não tiver 14 dígitos
     return preg_replace("/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/", "$1.$2.$3/$4-$5", $cnpj);
@@ -123,7 +124,7 @@ function formatarCNPJ($cnpj) {
             <h2><?php echo htmlspecialchars($empresa['razao_social']); ?></h2>
             <p>CNPJ: <?php echo formatarCNPJ($empresa['cnpj']); ?></p>
         </div>
-        
+
     </div>
 
     <!-- Cards de Estatísticas -->
@@ -185,106 +186,143 @@ function formatarCNPJ($cnpj) {
 
     <!-- Lista de Funcionários -->
     <div class="main-content">
-    <div class="content-header">
-        <h2>Funcionários</h2>
-        <div class="content-actions">
-            <div class="search-bar">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchEmployee" placeholder="Buscar funcionário...">
-            </div>
-            <!-- <a href="novo_funcionario.php" class="btn btn-primary">
+        <div class="content-header">
+            <h2>Funcionários</h2>
+            <div class="content-actions">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchEmployee" placeholder="Buscar funcionário...">
+                </div>
+                <!-- <a href="novo_funcionario.php" class="btn btn-primary">
                 <i class="fas fa-plus"></i>
                 Novo
             </a> -->
+            </div>
         </div>
-    </div>
 
-    <?php if ($totalEmployees > 0): ?>
-        <div class="responsive-table">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>CPF</th>
-                        <th>Visualizar</th>
-                    </tr>
-                </thead>
-                <tbody id="employeeTableBody">
-                    <?php foreach ($empregados as $empregado): ?>
+        <?php if ($totalEmployees > 0): ?>
+            <div class="responsive-table">
+                <table>
+                    <thead>
                         <tr>
-                            <td><?php echo htmlspecialchars($empregado['nome']); ?></td>
-                            <td><?php echo htmlspecialchars($empregado['cpf']); ?></td>
-                            <td>
-                                <div class="action-buttons">
-                                <button class="action-btn view-btn" title="Visualizar" 
-        onclick="showEmployeePopup(<?php echo $empregado['i_empregados']; ?>, '<?php echo htmlspecialchars($empregado['nome']); ?>')">
-    <i class="fas fa-eye"></i>
-</button>
-                                    <!-- <a href="editar_empregado.php?id=<?php echo $empregado['i_empregados']; ?>" class="action-btn edit-btn" title="Editar">
+                            <th>Nome</th>
+                            <th>CPF</th>
+                            <th>Visualizar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employeeTableBody">
+                        <?php foreach ($empregados as $empregado): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($empregado['nome']); ?></td>
+                                <td><?php echo htmlspecialchars($empregado['cpf']); ?></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn view-btn" title="Visualizar"
+                                            onclick="showEmployeePopup(<?php echo $empregado['i_empregados']; ?>, '<?php echo htmlspecialchars($empregado['nome']); ?>')">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <!-- <a href="editar_empregado.php?id=<?php echo $empregado['i_empregados']; ?>" class="action-btn edit-btn" title="Editar">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <button class="action-btn delete-btn" title="Excluir" 
                                             onclick="showDeleteModal(<?php echo $empregado['i_empregados']; ?>, '<?php echo htmlspecialchars($empregado['nome']); ?>')">
                                         <i class="fas fa-trash"></i>
                                     </button> -->
-                                </div>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Paginação -->
-        <div class="pagination-container">
-            <div class="pagination-info">
-                Mostrando <?php echo $startIndex + 1; ?> a <?php echo min($endIndex + 1, $totalEmployees); ?> de <?php echo $totalEmployees; ?> funcionários
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
-            <div class="pagination">
-                <!-- Botão para primeira página -->
-                <a href="?page=1<?php echo !empty($searchTerm) ? '&search='.urlencode($searchTerm) : ''; ?>" class="pagination-btn <?php echo $currentPage == 1 ? 'disabled' : ''; ?>" title="Primeira página">
-                    <i class="fas fa-angle-double-left"></i>
-                </a>
-                
-                <!-- Botão para página anterior -->
-                <a href="?page=<?php echo max(1, $currentPage - 1); ?><?php echo !empty($searchTerm) ? '&search='.urlencode($searchTerm) : ''; ?>" class="pagination-btn <?php echo $currentPage == 1 ? 'disabled' : ''; ?>" title="Página anterior">
-                    <i class="fas fa-angle-left"></i>
-                </a>
-                
-                <!-- Números das páginas -->
-                <?php
-                $startPage = max(1, min($currentPage - 2, $totalPages - 4));
-                $endPage = min($startPage + 4, $totalPages);
-                
-                for ($i = $startPage; $i <= $endPage; $i++):
-                ?>
-                    <a href="?page=<?php echo $i; ?><?php echo !empty($searchTerm) ? '&search='.urlencode($searchTerm) : ''; ?>" class="pagination-btn <?php echo $currentPage == $i ? 'active' : ''; ?>">
-                        <?php echo $i; ?>
+
+            <!-- Paginação -->
+            <div class="pagination-container">
+                <div class="pagination-info">
+                    Mostrando <?php echo $startIndex + 1; ?> a <?php echo min($endIndex + 1, $totalEmployees); ?> de <?php echo $totalEmployees; ?> funcionários
+                </div>
+                <div class="pagination">
+                    <!-- Botão para primeira página -->
+                    <a href="?page=1<?php echo !empty($searchTerm) ? '&search=' . urlencode($searchTerm) : ''; ?>" class="pagination-btn <?php echo $currentPage == 1 ? 'disabled' : ''; ?>" title="Primeira página">
+                        <i class="fas fa-angle-double-left"></i>
                     </a>
-                <?php endfor; ?>
-                
-                <!-- Botão para próxima página -->
-                <a href="?page=<?php echo min($totalPages, $currentPage + 1); ?><?php echo !empty($searchTerm) ? '&search='.urlencode($searchTerm) : ''; ?>" class="pagination-btn <?php echo $currentPage == $totalPages ? 'disabled' : ''; ?>" title="Próxima página">
-                    <i class="fas fa-angle-right"></i>
-                </a>
-                
-                <!-- Botão para última página -->
-                <a href="?page=<?php echo $totalPages; ?><?php echo !empty($searchTerm) ? '&search='.urlencode($searchTerm) : ''; ?>" class="pagination-btn <?php echo $currentPage == $totalPages ? 'disabled' : ''; ?>" title="Última página">
-                    <i class="fas fa-angle-double-right"></i>
-                </a>
-            </div>
-        </div>
-    <?php else: ?>
-        <div class="empty-state">
-            <div class="empty-state-icon">
-                <i class="fas fa-users"></i>
-            </div>
-            <h3>Nenhum funcionário cadastrado</h3>  
-        </div>
-    <?php endif; ?>
-</div>
-</div>
 
+                    <!-- Botão para página anterior -->
+                    <a href="?page=<?php echo max(1, $currentPage - 1); ?><?php echo !empty($searchTerm) ? '&search=' . urlencode($searchTerm) : ''; ?>" class="pagination-btn <?php echo $currentPage == 1 ? 'disabled' : ''; ?>" title="Página anterior">
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+
+                    <!-- Números das páginas -->
+                    <?php
+                    $startPage = max(1, min($currentPage - 2, $totalPages - 4));
+                    $endPage = min($startPage + 4, $totalPages);
+
+                    for ($i = $startPage; $i <= $endPage; $i++):
+                    ?>
+                        <a href="?page=<?php echo $i; ?><?php echo !empty($searchTerm) ? '&search=' . urlencode($searchTerm) : ''; ?>" class="pagination-btn <?php echo $currentPage == $i ? 'active' : ''; ?>">
+                            <?php echo $i; ?>
+                        </a>
+                    <?php endfor; ?>
+
+                    <!-- Botão para próxima página -->
+                    <a href="?page=<?php echo min($totalPages, $currentPage + 1); ?><?php echo !empty($searchTerm) ? '&search=' . urlencode($searchTerm) : ''; ?>" class="pagination-btn <?php echo $currentPage == $totalPages ? 'disabled' : ''; ?>" title="Próxima página">
+                        <i class="fas fa-angle-right"></i>
+                    </a>
+
+                    <!-- Botão para última página -->
+                    <a href="?page=<?php echo $totalPages; ?><?php echo !empty($searchTerm) ? '&search=' . urlencode($searchTerm) : ''; ?>" class="pagination-btn <?php echo $currentPage == $totalPages ? 'disabled' : ''; ?>" title="Última página">
+                        <i class="fas fa-angle-double-right"></i>
+                    </a>
+                </div>
+            </div>
+        <?php else: ?>
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Nenhum funcionário cadastrado</h3>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <!-- Feedback -->
+    <div class="feedback-module">
+        <div class="feedback-wrapper" data-page="dashboard">
+            <div id="feedback-main">
+                <div class="feedback-header">
+                    <h3>Avaliação de Experiência</h3>
+                    <p>Esta página foi útil para você?</p>
+                </div>
+                <div class="feedback-body">
+                    <div class="feedback-buttons">
+                        <div class="feedback-btn yes" data-response="Sim">
+                            <i class="fas fa-thumbs-up"></i>
+                            <span>Sim</span>
+                        </div>
+                        <div class="feedback-btn no" data-response="Não">
+                            <i class="fas fa-thumbs-down"></i>
+                            <span>Não</span>
+                        </div>
+                    </div>
+                    
+                    <div id="feedback-comment" class="feedback-comment">
+                        <label for="feedback-text">Sua opinião é importante. Conte-nos mais:</label>
+                        <textarea id="feedback-text" placeholder="Compartilhe seus comentários ou sugestões para melhorarmos..."></textarea>
+                        <div class="feedback-actions">
+                            <button id="cancel-feedback" class="btn btn-outline">Cancelar</button>
+                            <button id="submit-feedback" class="btn btn-primary">Enviar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="feedback-success" class="feedback-success">
+                <i class="fas fa-check-circle"></i>
+                <h3>Obrigado pelo seu feedback!</h3>
+                <p>Sua opinião é muito importante para continuarmos melhorando.</p>
+            </div>
+        </div>
+        </div>
 <!-- Modal de Visualização de Funcionário -->
 <div id="employeePopup" class="modal">
     <div class="modal-content employee-modal">
@@ -299,7 +337,7 @@ function formatarCNPJ($cnpj) {
                     <p>Carregando informações...</p>
                 </div>
             </div>
-            
+
             <div id="employeeData" class="employee-data-container" style="display: none;">
                 <!-- Cabeçalho -->
                 <div class="employee-section employee-header-section">
@@ -316,7 +354,7 @@ function formatarCNPJ($cnpj) {
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Abas de informações -->
                 <div class="employee-tabs">
                     <button class="tab-btn active" data-tab="personal">Dados Pessoais</button>
@@ -324,7 +362,7 @@ function formatarCNPJ($cnpj) {
                     <button class="tab-btn" data-tab="contact">Contato</button>
                     <button class="tab-btn" data-tab="benefits">Benefícios</button>
                 </div>
-                
+
                 <!-- Conteúdo das abas -->
                 <div class="tabs-content">
                     <!-- Tab: Dados Pessoais -->
@@ -356,7 +394,7 @@ function formatarCNPJ($cnpj) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Tab: Contrato -->
                     <div class="tab-content" id="tab-contract">
                         <div class="employee-details-grid">
@@ -386,7 +424,7 @@ function formatarCNPJ($cnpj) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Tab: Contato -->
                     <div class="tab-content" id="tab-contact">
                         <div class="employee-details-grid">
@@ -412,7 +450,7 @@ function formatarCNPJ($cnpj) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Tab: Benefícios -->
                     <div class="tab-content" id="tab-benefits">
                         <div class="employee-details-grid">
@@ -446,6 +484,6 @@ function formatarCNPJ($cnpj) {
         </div>
     </div>
 </div>
+</div>
 
-
-<?php include '../../includes/footer.php'; ?> 
+<?php include '../../includes/footer.php'; ?>

@@ -257,7 +257,8 @@ h1 {
 
 
 .main-footer {
-    background-color: #FA4A60; /* Cor da Canella */
+    width: 100%;
+    background-color: #252525; /* Cor da Canella */
     padding: 30px 0;
     border-top: 1px solid #e9ecef;
     color: #e9ecef;
@@ -309,7 +310,7 @@ h1 {
 }
 
 .footer-section ul li a:hover {
-    color: #007bff;
+    color: #21C6E4;
 }
 
 /* Estilos para a seção inferior */
@@ -437,7 +438,6 @@ body {
 .dashboard-wrapper {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 1.5rem;
 }
 
 .company-header {
@@ -445,6 +445,7 @@ body {
     border-radius: 8px;
     box-shadow: var(--box-shadow);
     padding: 1.5rem;
+    margin-top: 1.5rem; 
     margin-bottom: 1.5rem;
     display: flex;
     justify-content: space-between;

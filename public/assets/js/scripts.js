@@ -347,4 +347,90 @@ document.getElementById('exportButton').addEventListener('click', function(e) {
     alert('Funcionalidade de exportação será implementada em breve.');
 });
 
+//Feedback
 
+ // Selecionando elementos
+ const feedbackBtns = document.querySelectorAll('.feedback-btn');
+ const commentSection = document.getElementById('feedback-comment');
+ const submitBtn = document.getElementById('submit-feedback');
+ const cancelBtn = document.getElementById('cancel-feedback');
+ const feedbackMain = document.getElementById('feedback-main');
+ const feedbackSuccess = document.getElementById('feedback-success');
+ const feedbackText = document.getElementById('feedback-text');
+ const feedbackWrapper = document.querySelector('.feedback-wrapper');
+ 
+ let selectedResponse = null;
+ 
+ // Adicionando eventos aos botões de feedback
+ feedbackBtns.forEach(button => {
+     button.addEventListener('click', function() {
+         // Removendo estado ativo de todos os botões
+         feedbackBtns.forEach(btn => btn.classList.remove('active'));
+         
+         // Adicionando estado ativo ao botão clicado
+         this.classList.add('active');
+         
+         // Salvando a resposta selecionada
+         selectedResponse = this.getAttribute('data-response');
+         
+         // Mostrando a seção de comentários com animação
+         commentSection.style.display = 'block';
+         
+         // Foco no textarea
+         feedbackText.focus();
+     });
+ });
+ 
+ // Função para cancelar o feedback
+ cancelBtn.addEventListener('click', function() {
+     // Escondendo a seção de comentários
+     commentSection.style.display = 'none';
+     
+     // Removendo estado ativo dos botões
+     feedbackBtns.forEach(btn => btn.classList.remove('active'));
+     
+     // Limpando o textarea
+     feedbackText.value = '';
+     
+     // Resetando a resposta selecionada
+     selectedResponse = null;
+ });
+ 
+ // Função para enviar o feedback
+ submitBtn.addEventListener('click', function() {
+    if (!selectedResponse) {
+        alert('Por favor, selecione uma opção antes de enviar.');
+        return;
+    }
+    const comment = feedbackText.value.trim();
+    const pagina = feedbackWrapper.getAttribute('data-page'); // Obtém o valor do atributo data-page
+    submitFeedback(selectedResponse, comment, pagina); // Passa a variável pagina
+});
+
+function submitFeedback(response, comment, page) {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/ClienteCanella/public/feedback.php", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                feedbackMain.style.display = 'none';
+                feedbackSuccess.style.display = 'block';
+                setTimeout(() => {
+                    feedbackText.value = '';
+                    feedbackBtns.forEach(btn => btn.classList.remove('active'));
+                    commentSection.style.display = 'none';
+                    feedbackSuccess.style.display = 'none';
+                    feedbackMain.style.display = 'block';
+                    selectedResponse = null;
+                }, 2000);
+            } else {
+                alert("Ocorreu um erro ao enviar seu feedback. Por favor, tente novamente.");
+            }
+        }
+    };
+
+    console.log("Enviando: response=" + response + ", comment=" + comment + ", pagina=" + page);
+    xhr.send(`response=${response}&comment=${encodeURIComponent(comment)}&pagina=${encodeURIComponent(page)}`);
+}
