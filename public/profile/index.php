@@ -9,6 +9,10 @@ if (!isset($_SESSION['user_id'])) {
 require_once '../../app/database.php';
 require_once '../utils.php';
 
+$css_files = [
+    '../assets/css/feedback.css',
+    '../assets/css/dashboard.css'
+];
 $page_title = "Perfil | Canella & Santos"; // Título padrão para a página de login
 
 // Caso haja uma mensagem de erro, você pode alterar o título para algo como "Erro ao fazer login"

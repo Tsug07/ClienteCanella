@@ -1,4 +1,4 @@
-.feedback-module {
+/* .feedback-module {
     --primary-color: #3B82F6;
     --primary-hover: #2563EB;
     --success-color: #10B981;
@@ -15,11 +15,39 @@
     width: 100%;
     max-width: 600px;
     margin: 0 auto 20px;
+} */
+
+/* ===== VARIÁVEIS GLOBAIS UNIFICADAS ===== */
+:root {
+    /* Cores principais (alinhadas com auth.css) */
+    --primary-color: #FA4A60;
+    --primary-light: #FF7B8B;
+    --secondary-color: #2C3E50;
+    --secondary-light: #7F8C8D;
+    --border-color: #E0E0E0;
+    --light-color: #f8f9fa;
+    --white: #ffffff;
+    
+    /* Efeitos */
+    --glass-effect: rgba(255, 255, 255, 0.95);
+    --shadow-sm: 0 2px 8px rgba(250, 74, 96, 0.1);
+    --shadow-md: 0 4px 12px rgba(250, 74, 96, 0.15);
+    --shadow-lg: 0 10px 30px rgba(250, 74, 96, 0.2);
+    
+    /* Bordas */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    
+    /* Transições */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
 }
 
-.feedback-module * {
+/* .feedback-module * {
     box-sizing: border-box;
-}
+} */
 
 .feedback-wrapper {
     background-color: white;
@@ -154,7 +182,7 @@
     margin-top: 1rem;
 }
 
-.feedback-module .btn {
+/* .feedback-module .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -167,9 +195,45 @@
     transition: var(--transition);
     border: none;
     outline: none;
+} */
+
+/* Botões */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all var(--transition-normal);
+    cursor: pointer;
+    border: none;
+    box-shadow: var(--shadow-sm);
 }
 
-.feedback-module .btn-primary {
+.btn-primary {
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+    color: var(--white);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn-outline:hover {
+    background: rgba(250, 74, 96, 0.1);
+    transform: translateY(-2px);
+}
+
+/* .feedback-module .btn-primary {
     background-color: var(--primary-color);
     color: white;
 }
@@ -187,7 +251,7 @@
 .feedback-module .btn-outline:hover {
     background-color: var(--light-color);
     color: var(--dark-color);
-}
+} */
 
 .feedback-success {
     display: none;
@@ -220,10 +284,10 @@
 }
 
 @media (max-width: 576px) {
-    .feedback-module {
+    /* .feedback-module {
         margin: 0 auto 15px;
         padding: 0 10px;
-    }
+    } */
     
     .feedback-header {
         padding: 1rem 0.75rem 0.5rem;

@@ -4,12 +4,17 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 session_start();
-// Definindo o título dinâmico para a página
-$page_title = "Token | Canella & Santos"; // Título padrão para a página de login
 
-// Caso haja uma mensagem de erro, você pode alterar o título para algo como "Erro ao fazer login"
+$css_files = [
+    '../assets/css/auth.css'
+];
+$js_files = [
+    '../assets/js/auth.js'
+];
+$page_title = "Token | Canella & Santos";
+
 if (isset($_SESSION['error'])) {
-    $page_title = "Erro no Inserir Token || Canella & Santos";
+    $page_title = "Erro no Token || Canella & Santos";
 }
 
 include '../../includes/head.php';
@@ -19,25 +24,55 @@ include '../../includes/head.php';
     <div class="login-container">
         <?php
         if (isset($_SESSION['error'])) {
-            echo '<div class="alert alert-error">' . $_SESSION['error'] . '</div>';
+            echo '<div class="alert alert-error animate-fade-in">';
+            echo '<span>' . $_SESSION['error'] . '</span>';
+            echo '<button class="alert-close" aria-label="Fechar">&times;</button>';
+            echo '</div>';
             unset($_SESSION['error']);
         }
         if (isset($_SESSION['success'])) {
-            echo '<div class="alert alert-success">' . $_SESSION['success'] . '</div>';
+            echo '<div class="alert alert-success animate-fade-in">';
+            echo '<span>' . $_SESSION['success'] . '</span>';
+            echo '<button class="alert-close" aria-label="Fechar">&times;</button>';
+            echo '</div>';
             unset($_SESSION['success']);
         }
         ?>
-        <img src="../assets/images/logo_canella.png" alt="Logo Canella & Santos" class="logo">
-        <h2>Inserir Token</h2>
+        <div class="logo-container">
+            <img src="../assets/images/logo_canella.png" alt="Logo Canella & Santos" class="logo">
+        </div>
 
-        <form action="/ClienteCanella/app/auth.php?action=login" method="post">
-            <label for="token">Token:</label>
-            <input type="text" id="token" name="token" required>
-            <button type="submit">Entrar</button>
-        </form>
-        <!-- Link para reenviar o token -->
-        <p class="resend-token-link">
-            Não recebeu o token? <a href="/ClienteCanella/app/auth.php?action=request_token&resend=true">Clique aqui para reenviar</a>.
-        </p>
+        <div class="login-content">
+            <h3 class="login-title">Verificação de Token</h3>
+            <p class="login-subtitle">Insira o token enviado para seu email</p>
+
+            <form action="/ClienteCanella/app/auth.php?action=login" method="post" class="login-form">
+                <div class="input-group">
+                    <label for="token">Código Token</label>
+                    <input type="text" id="token" name="token" required placeholder="XXXXXX" class="token-input">
+                    <div class="input-underline"></div>
+                </div>
+
+                <button type="submit" class="login-button">
+                    <span class="button-text">Verificar Token</span>
+                    <div class="button-loader">
+                        <div class="loader-dot"></div>
+                        <div class="loader-dot"></div>
+                        <div class="loader-dot"></div>
+                    </div>
+                </button>
+            </form>
+
+            <div class="login-links">
+                <a href="/ClienteCanella/app/auth.php?action=request_token&resend=true" class="sign-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 12A10 10 0 0 0 12 2a10 10 0 0 0-5 18.77"></path>
+                        <path d="M12 6v6l4 2"></path>
+                        <path d="M18 11.66V16a10 10 0 0 1-10-10"></path>
+                    </svg>
+                    Reenviar Token
+                </a>
+            </div>
+        </div>
     </div>
 </div>
