@@ -25,7 +25,7 @@ if ($employeeId <= 0) {
 // Consulta ao banco MariaDB
 $stmt = $conn->prepare("
     SELECT e.nome, e.cpf, e.admissao, e.salario, e.horas_mes, e.venc_ferias, data_nascimento, sexo, estado_civil, e.cep, cargos, nacionalidade,
-           e.email, e.fone, e.endereco, e.cidade, e.estado, e.plano_saude_optantes, CODIGO_ESOCIAL
+           e.email, e.fone, e.endereco, e.cidade, e.estado, e.plano_saude_optantes, CODIGO_ESOCIAL, opta_fgts, vinculo, sindicalizado, e.POSSUI_DEFICIENCIA
     FROM empregados e
     JOIN empresas emp ON e.codigo_empresa = emp.codigo_empresa
     WHERE e.i_empregados = ? AND emp.cnpj = ?

@@ -1,11 +1,4 @@
 
-// HEADER
-
-document.querySelector('.menu-toggle').addEventListener('click', function() {
-    document.querySelector('.nav-list').classList.toggle('active');
-});
-
-
 
 // Função para formatar o CPF (ex.: 11186627760 -> 111.866.277-60)
 function formatarCPF(cpf) {
@@ -76,6 +69,34 @@ function simNao(valor) {
     return 'Não';
 }
 
+function formatarSimNao(valor) {
+    if (valor === "S"){
+        return 'Sim';
+    } else {
+        return 'Não';
+    }
+}
+
+// Função para formatar contrato
+function formatarContrato(contrato) {
+    if (contrato == 1) {
+        return 'Celetista'; // Contrato CLT padrão
+    } else if (contrato == 50) {
+        return 'Estagiário'; // Contrato de estágio
+    } else if (contrato == 11) {
+        return 'Celetista'; // Hipótese: Trabalhador rural vinculado a pessoa jurídica
+    } else if (contrato == 13) {
+        return 'Celetista'; // Hipótese: Trabalhador rural vinculado a pessoa física
+    } else if (contrato == 99) {
+        return 'Celetista Tempo Parcial'; // Contrato CLT com jornada parcial
+    } else if (contrato == 56) {
+        return 'Celetista Intermitente'; // Contrato CLT intermitente
+    } else if (contrato == 53) {
+        return 'Aprendiz'; // Contrato de aprendiz pela CLT
+    } else {
+        return 'Desconhecido'; // Caso o código não esteja mapeado
+    }
+}
 // Função para obter o sexo por extenso
 function formatarSexo(sexo) {
     if (!sexo) return 'Não informado';

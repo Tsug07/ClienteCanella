@@ -10,9 +10,11 @@ include 'head.php';
 
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <!-- Meta tags e outros elementos head -->
 </head>
+
 <body>
     <header class="main-header">
         <div class="header-container">
@@ -21,7 +23,7 @@ include 'head.php';
                     <img src="../assets/images/logo_canella.png" alt="Canella & Santos" class="logo">
                 </a>
             </div>
-            
+
             <nav class="main-nav">
                 <ul class="nav-list">
                     <li class="nav-item">
@@ -48,7 +50,7 @@ include 'head.php';
                         </a>
                     </li>
                 </ul>
-                
+
                 <button class="menu-toggle" aria-label="Menu" aria-expanded="false">
                     <span class="menu-toggle-bar"></span>
                     <span class="menu-toggle-bar"></span>

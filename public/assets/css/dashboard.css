@@ -319,7 +319,27 @@ tr:hover td {
 }
 
 
+/* Transição suave para a tabela e paginação */
+#employeeTableBody, .pagination-container {
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
 
+/* Estado inicial ou durante carregamento */
+.fade-out {
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+/* Estado ao carregar novos dados */
+.fade-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Estilo opcional para o loader ficar mais integrado */
+#employeeTableBody .loader {
+    transition: opacity 0.3s ease;
+}
 /* ==== EMPLOYEE MODAL STYLES ==== */
 
 /* Modal base */

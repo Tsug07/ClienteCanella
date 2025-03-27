@@ -38,7 +38,7 @@
     transform: translateY(0);
     transition: all var(--transition-normal);
     will-change: transform;
-    background: linear-gradient(135deg, var(--white) 0%, var(--light-color) 100%);
+    background: var(--white);
     box-shadow: var(--shadow-sm);
     z-index: 1000;
 }
@@ -167,50 +167,57 @@
     background-color: #D32F2F;
 }
 
-/* Menu Hamburguer (mobile) */
+
+/* Ajustes no menu toggle */
 .menu-toggle {
-    position: relative;
-    z-index: 1000;
-    transition: transform var(--transition-fast);
-    display: none;
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    background: var(--primary-color); /* Usar cor sólida em vez de gradiente */
     border: none;
     cursor: pointer;
     padding: 10px;
     margin-left: 15px;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     width: 40px;
     height: 40px;
     border-radius: var(--radius-sm);
     box-shadow: var(--shadow-sm);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
+
+
+/* Estilo das barras */
 .menu-toggle-bar {
     display: block;
     width: 24px;
-    height: 2px;
-    background-color: var(--white);
-    margin: 4px 0;
+    height: 3px;
+    background-color: var(--white)!important; 
+    margin: 4px auto; /* Espaçamento entre as barras */
     transition: all var(--transition-fast);
     transform-origin: center;
+    position: relative;
+    z-index: 1001; /* Garante que fique acima de outros elementos */
 }
 
+.menu-toggle:hover .menu-toggle-bar {
+    background-color: var(--white);
+}
+
+/* Animação para formar o X */
 .menu-toggle[aria-expanded="true"] .menu-toggle-bar:nth-child(1) {
-    transform: translateY(6px) rotate(45deg);
+    transform: translateY(10px) rotate(45deg); /* Move para baixo e gira */
 }
 
 .menu-toggle[aria-expanded="true"] .menu-toggle-bar:nth-child(2) {
-    opacity: 0;
+    opacity: 0; /* A barra do meio desaparece */
 }
 
 .menu-toggle[aria-expanded="true"] .menu-toggle-bar:nth-child(3) {
-    transform: translateY(-6px) rotate(-45deg);
+    transform: translateY(-10px) rotate(-45deg); /* Move para cima e gira */
 }
 
-
-/* Responsividade */
+/* Ajustes nos links de navegação no mobile */
 @media (max-width: 768px) {
     .main-nav {
         position: relative;
@@ -220,16 +227,19 @@
         position: absolute;
         top: 100%;
         right: 0;
-        background: linear-gradient(135deg, var(--white) 0%, var(--light-color) 100%);
+        background: var(--white); /* Background sólido para melhor contraste */
         flex-direction: column;
         width: 220px;
         box-shadow: var(--shadow-lg);
-        border-radius: 0 0 var(--radius-md) var(--radius-md);
-        padding: 15px 0;
+        border-radius: var(--radius-md);
+        padding: 0; /* Removi padding vertical para links encostarem nas bordas */
+        margin: 5px 0 0 0; /* Pequena margem superior para separação */
         opacity: 0;
         visibility: hidden;
         transform: translateY(-10px);
         transition: all var(--transition-normal);
+        z-index: 1000;
+        overflow: hidden; /* Garante que os links não vazem */
     }
     
     .nav-list.active {
@@ -240,29 +250,56 @@
     
     .nav-item {
         width: 100%;
+        margin: 0; /* Remove margens extras */
     }
     
     .nav-link {
         padding: 12px 20px;
-        border-radius: 0;
+        border-radius: 0; /* Remove bordas arredondadas para encostar nas laterais */
+        justify-content: flex-start;
+        width: 100%;
+        box-sizing: border-box; /* Garante que o padding não exceda a largura */
+        background: var(--white); /* Background padrão sólido */
+        margin: 0; /* Remove margens */
+        border-bottom: 1px solid var(--border-color); /* Separação sutil entre itens */
+    }
+    
+    .nav-link:hover {
+        background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+        color: var(--white);
+        transform: translateY(0); /* Remove o translateY no hover no mobile */
+    }
+    
+    .nav-list .nav-item:last-child .nav-link {
+        border-bottom: none; /* Remove borda do último item */
+    }
+    
+    .logout-btn {
+        color: #D32F2F;
+        background-color: var(--white); /* Fundo consistente */
+    }
+    
+    .logout-btn:hover {
+        color: var(--white);
+        background: #D32F2F; /* Cor sólida no hover */
     }
     
     .menu-toggle {
-        display: flex;
+        display: flex; /* Garante que aparece no mobile */
     }
     
     .logo-text {
         display: none;
     }
-    
 }
 
 /* Efeito de scroll no header */
 .main-header.scrolled {
+    background: rgba(255, 255, 255, 0.95); /* Glass effect mais consistente */
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-md);
     height: 60px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
-
 .main-header.scrolled .logo {
     height: 35px;
 }
