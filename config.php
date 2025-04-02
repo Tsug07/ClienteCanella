@@ -2,21 +2,10 @@
 require_once __DIR__ . '/vendor/autoload.php';
 use Dotenv\Dotenv;
 
-// Carregar .env apenas se existir (para ambiente local)
 if (file_exists(__DIR__ . '/.env')) {
     $dotenv = Dotenv::createImmutable(__DIR__);
     $dotenv->load();
 }
-
-// No início do config.php
-if (getenv('DB_SSL_CA')) {
-    file_put_contents('/tmp/caCertificate-mysqlnuvem.pem', getenv('DB_SSL_CA'));
-    $sslCertPath = '/tmp/caCertificate-mysqlnuvem.pem';
-} else {
-    $sslCertPath = __DIR__ . '/caCertificate-mysqlnuvem.pem';
-}
-
-
 
 define('DB_HOST', getenv('DB_HOST'));
 define('DB_USER', getenv('DB_USER'));
@@ -31,9 +20,17 @@ define('SMTP_PASS', getenv('SMTP_PASS'));
 define('SMTP_FROM', getenv('SMTP_FROM'));
 define('SMTP_FROM_NAME', getenv('SMTP_FROM_NAME'));
 
+error_log("DB_HOST: " . (DB_HOST ?: 'não definido'));
+error_log("DB_USER: " . (DB_USER ?: 'não definido'));
+error_log("DB_PASSWORD: " . (DB_PASSWORD ?: 'não definido'));
+error_log("DB_NAME: " . (DB_NAME ?: 'não definido'));
+error_log("DB_PORT: " . (DB_PORT ?: '0'));
 
 $conn = mysqli_init();
-// Mais tarde, na conexão
+$sslCertPath = getenv('DB_SSL_CA') ? '/tmp/caCertificate-mysqlnuvem.pem' : __DIR__ . '/caCertificate-mysqlnuvem.pem';
+if (getenv('DB_SSL_CA')) {
+    file_put_contents($sslCertPath, getenv('DB_SSL_CA'));
+}
 mysqli_ssl_set($conn, NULL, NULL, $sslCertPath, NULL, NULL);
 mysqli_real_connect($conn, DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT, NULL, MYSQLI_CLIENT_SSL);
 
